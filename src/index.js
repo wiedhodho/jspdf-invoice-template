@@ -87,7 +87,6 @@ export { OutputType, jsPDF };
  *   pageLabel?: string, } } props
  */
 function jsPDFInvoiceTemplate(props) {
-  console.log("coba edit sendiri");
   const param = {
     outputType: props.outputType || "save",
     returnJsPDFDocObject: props.returnJsPDFDocObject || false,
@@ -385,7 +384,14 @@ function jsPDFInvoiceTemplate(props) {
     let startWidth = 0;
     row.forEach(function (rr, index) {
       const widthToUse = param.invoice.header[index]?.style?.width || tdWidth;
-      let item = splitTextAndGetHeight(rr.toString(), widthToUse - 1); //minus 1, to fix the padding issue between borders
+      let style = "";
+      if (typeof rr === "object") {
+        let txt = rr.text;
+        style = rr.style;
+        let item = splitTextAndGetHeight(txt.toString(), widthToUse - 1); //minus 1, to fix the padding issue between borders
+      } else {
+        let item = splitTextAndGetHeight(rr.toString(), widthToUse - 1); //minus 1, to fix the padding issue between borders
+      }
 
       if (index == 0) doc.text(item.text, 11, currentHeight + 4);
       else {
@@ -393,7 +399,7 @@ function jsPDFInvoiceTemplate(props) {
         const previousTdWidth = param.invoice.header[index - 1]?.style?.width || tdWidth;
         const widthToUse = currentTdWidth == previousTdWidth ? currentTdWidth : previousTdWidth;
         startWidth += widthToUse;
-        doc.text(item.text, 11 + startWidth, currentHeight + 4);
+        doc.text(item.text, 11 + startWidth, currentHeight + 4, style);
       }
     });
 
