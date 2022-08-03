@@ -63,9 +63,9 @@ export { OutputType, jsPDF };
  *       invGenDate?: string,
  *       headerBorder?: boolean,
  *       tableBodyBorder?: boolean,
- *       header?: 
+ *       header?:
  *        {
- *          title: string, 
+ *          title: string,
  *          style?: { width?: number }
  *        }[],
  *       table?: any,
@@ -87,6 +87,7 @@ export { OutputType, jsPDF };
  *   pageLabel?: string, } } props
  */
 function jsPDFInvoiceTemplate(props) {
+  console.log("coba edit sendiri");
   const param = {
     outputType: props.outputType || "save",
     returnJsPDFDocObject: props.returnJsPDFDocObject || false,
@@ -140,16 +141,16 @@ function jsPDFInvoiceTemplate(props) {
       table: props.invoice?.table || [],
       invDescLabel: props.invoice?.invDescLabel || "",
       invDesc: props.invoice?.invDesc || "",
-      additionalRows: props.invoice?.additionalRows?.map(x => {
+      additionalRows: props.invoice?.additionalRows?.map((x) => {
         return {
           col1: x?.col1 || "",
           col2: x?.col2 || "",
           col3: x?.col3 || "",
           style: {
             fontSize: x?.style?.fontSize || 12,
-          }
-        }
-      })
+          },
+        };
+      }),
     },
     footer: {
       text: props.footer?.text || "",
@@ -166,13 +167,12 @@ function jsPDFInvoiceTemplate(props) {
     };
   };
   if (param.invoice.table && param.invoice.table.length) {
-    if (param.invoice.table[0].length != param.invoice.header.length)
-      throw Error("Length of header and table column must be equal.");
+    if (param.invoice.table[0].length != param.invoice.header.length) throw Error("Length of header and table column must be equal.");
   }
 
   const options = {
     orientation: param.orientationLandscape ? "landscape" : "",
-    compress: param.compress
+    compress: param.compress,
   };
 
   var doc = new jsPDF(options);
@@ -200,7 +200,7 @@ function jsPDFInvoiceTemplate(props) {
   doc.setFontSize(pdfConfig.fieldTextSize);
 
   if (param.logo.src) {
-    var imageHeader = '';
+    var imageHeader = "";
     if (typeof window === "undefined") {
       imageHeader = param.logo.src;
     } else {
@@ -209,22 +209,8 @@ function jsPDFInvoiceTemplate(props) {
     }
     //doc.text(htmlDoc.sessionDateText, docWidth - (doc.getTextWidth(htmlDoc.sessionDateText) + 10), currentHeight);
     if (param.logo.type)
-      doc.addImage(
-        imageHeader,
-        param.logo.type,
-        10 + param.logo.margin.left,
-        currentHeight - 5 + param.logo.margin.top,
-        param.logo.width,
-        param.logo.height
-      );
-    else
-      doc.addImage(
-        imageHeader,
-        10 + param.logo.margin.left,
-        currentHeight - 5 + param.logo.margin.top,
-        param.logo.width,
-        param.logo.height
-      );
+      doc.addImage(imageHeader, param.logo.type, 10 + param.logo.margin.left, currentHeight - 5 + param.logo.margin.top, param.logo.width, param.logo.height);
+    else doc.addImage(imageHeader, 10 + param.logo.margin.left, currentHeight - 5 + param.logo.margin.top, param.logo.width, param.logo.height);
   }
 
   doc.setTextColor(colorGray);
@@ -265,16 +251,10 @@ function jsPDFInvoiceTemplate(props) {
   if (param.contact.name) doc.text(10, currentHeight, param.contact.name);
 
   if (param.invoice.label && param.invoice.num) {
-    doc.text(
-      docWidth - 10,
-      currentHeight,
-      param.invoice.label + param.invoice.num,
-      "right"
-    );
+    doc.text(docWidth - 10, currentHeight, param.invoice.label + param.invoice.num, "right");
   }
 
-  if (param.contact.name || (param.invoice.label && param.invoice.num))
-    currentHeight += pdfConfig.subLineHeight;
+  if (param.contact.name || (param.invoice.label && param.invoice.num)) currentHeight += pdfConfig.subLineHeight;
 
   doc.setTextColor(colorGray);
   doc.setFontSize(pdfConfig.fieldTextSize - 2);
@@ -296,8 +276,7 @@ function jsPDFInvoiceTemplate(props) {
     currentHeight += pdfConfig.subLineHeight;
   }
 
-  if (param.contact.otherInfo)
-    doc.text(10, currentHeight, param.contact.otherInfo);
+  if (param.contact.otherInfo) doc.text(10, currentHeight, param.contact.otherInfo);
   else currentHeight -= pdfConfig.subLineHeight;
   //end contact part
 
@@ -307,8 +286,9 @@ function jsPDFInvoiceTemplate(props) {
   var tdWidth = (doc.getPageWidth() - 20) / param.invoice.header.length;
 
   //#region TD WIDTH
-  if (param.invoice.header.length > 2) { //add style for 2 or more columns
-    const customColumnNo = param.invoice.header.map(x => x?.style?.width || 0).filter(x => x > 0);
+  if (param.invoice.header.length > 2) {
+    //add style for 2 or more columns
+    const customColumnNo = param.invoice.header.map((x) => x?.style?.width || 0).filter((x) => x > 0);
     let customWidthOfAllColumns = customColumnNo.reduce((a, b) => a + b, 0);
     tdWidth = (doc.getPageWidth() - 20 - customWidthOfAllColumns) / (param.invoice.header.length - customColumnNo.length);
   }
@@ -425,21 +405,13 @@ function jsPDFInvoiceTemplate(props) {
     //pre-increase currentHeight to check the height based on next row
     if (index + 1 < tableBodyLength) currentHeight += maxHeight;
 
-    if (
-      param.orientationLandscape &&
-      (currentHeight > 185 ||
-        (currentHeight > 178 && doc.getNumberOfPages() > 1))
-    ) {
+    if (param.orientationLandscape && (currentHeight > 185 || (currentHeight > 178 && doc.getNumberOfPages() > 1))) {
       doc.addPage();
       currentHeight = 10;
       if (index + 1 < tableBodyLength) addTableHeader();
     }
 
-    if (
-      !param.orientationLandscape &&
-      (currentHeight > 265 ||
-        (currentHeight > 255 && doc.getNumberOfPages() > 1))
-    ) {
+    if (!param.orientationLandscape && (currentHeight > 265 || (currentHeight > 255 && doc.getNumberOfPages() > 1))) {
       doc.addPage();
       currentHeight = 10;
       if (index + 1 < tableBodyLength) addTableHeader();
@@ -452,13 +424,10 @@ function jsPDFInvoiceTemplate(props) {
       // check if new page
       currentHeight -= maxHeight;
   });
-  //doc.line(10, currentHeight, docWidth - 10, currentHeight); //if we want to show the last table line 
+  //doc.line(10, currentHeight, docWidth - 10, currentHeight); //if we want to show the last table line
   //#endregion
 
-  var invDescSize = splitTextAndGetHeight(
-    param.invoice.invDesc,
-    docWidth / 2
-  ).height;
+  var invDescSize = splitTextAndGetHeight(param.invoice.invDesc, docWidth / 2).height;
 
   //#region PAGE BREAKER
   var checkAndAddPageLandscape = function () {
@@ -466,57 +435,41 @@ function jsPDFInvoiceTemplate(props) {
       doc.addPage();
       currentHeight = 10;
     }
-  }
+  };
 
   var checkAndAddPageNotLandscape = function (heightLimit = 173) {
     if (param.orientationLandscape && currentHeight + invDescSize > heightLimit) {
       doc.addPage();
       currentHeight = 10;
     }
-  }
+  };
   var checkAndAddPage = function () {
     checkAndAddPageNotLandscape();
     checkAndAddPageLandscape();
-  }
+  };
   //#endregion
 
   //#region Stamp
   var addStamp = () => {
     let _addStampBase = () => {
-      var stampImage = '';
+      var stampImage = "";
       if (typeof window === "undefined") {
         stampImage = param.stamp.src;
       } else {
         stampImage = new Image();
         stampImage.src = param.stamp.src;
       }
-      
+
       if (param.stamp.type)
-        doc.addImage(
-          stampImage,
-          param.stamp.type,
-          10 + param.stamp.margin.left,
-          docHeight - 22 + param.stamp.margin.top,
-          param.stamp.width,
-          param.stamp.height
-        );
-      else
-        doc.addImage(
-          stampImage,
-          10 + param.stamp.margin.left,
-          docHeight - 22 + param.stamp.margin.top,
-          param.stamp.width,
-          param.stamp.height
-        );
+        doc.addImage(stampImage, param.stamp.type, 10 + param.stamp.margin.left, docHeight - 22 + param.stamp.margin.top, param.stamp.width, param.stamp.height);
+      else doc.addImage(stampImage, 10 + param.stamp.margin.left, docHeight - 22 + param.stamp.margin.top, param.stamp.width, param.stamp.height);
     };
 
     if (param.stamp.src) {
-      if (param.stamp.inAllPages)
-        _addStampBase();
-      else if (!param.stamp.inAllPages && doc.getCurrentPageInfo().pageNumber == doc.getNumberOfPages())
-        _addStampBase();
+      if (param.stamp.inAllPages) _addStampBase();
+      else if (!param.stamp.inAllPages && doc.getCurrentPageInfo().pageNumber == doc.getNumberOfPages()) _addStampBase();
     }
-  }
+  };
   //#endregion
 
   checkAndAddPage();
@@ -561,11 +514,7 @@ function jsPDFInvoiceTemplate(props) {
       if (param.pageEnable) {
         doc.text(docWidth / 2, docHeight - 10, param.footer.text, "center");
         doc.setPage(i);
-        doc.text(
-          param.pageLabel + " " + i + " / " + doc.getNumberOfPages(),
-          docWidth - 20,
-          doc.internal.pageSize.height - 6
-        );
+        doc.text(param.pageLabel + " " + i + " / " + doc.getNumberOfPages(), docWidth - 20, doc.internal.pageSize.height - 6);
       }
 
       checkAndAddPageNotLandscape(183);
@@ -588,10 +537,7 @@ function jsPDFInvoiceTemplate(props) {
     var lines = doc.splitTextToSize(param.invoice.invDesc, docWidth / 2);
     //text in left half
     doc.text(lines, 10, currentHeight);
-    currentHeight +=
-      doc.getTextDimensions(lines).h > 5
-        ? doc.getTextDimensions(lines).h + 6
-        : pdfConfig.lineHeight;
+    currentHeight += doc.getTextDimensions(lines).h > 5 ? doc.getTextDimensions(lines).h + 6 : pdfConfig.lineHeight;
 
     return currentHeight;
   };
@@ -605,11 +551,7 @@ function jsPDFInvoiceTemplate(props) {
     doc.setFontSize(pdfConfig.fieldTextSize - 2);
     doc.setTextColor(colorGray);
     doc.text(docWidth / 2, docHeight - 10, param.footer.text, "center");
-    doc.text(
-      param.pageLabel + "1 / 1",
-      docWidth - 20,
-      doc.internal.pageSize.height - 6
-    );
+    doc.text(param.pageLabel + "1 / 1", docWidth - 20, doc.internal.pageSize.height - 6);
   }
   //#endregion
 

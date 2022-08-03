@@ -1,6 +1,6 @@
 {
-  "name": "jspdf-invoice-template-nodejs",
-  "version": "1.4.30",
+  "name": "@wiedhodho/jspdf-invoice-template-nodejs",
+  "version": "1.5.30",
   "description": "PDF template created for invoice with optional parameters (for NodeJs). Using jsPDF library.",
   "main": "./dist/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/edisonneza/jspdf-invoice-template/tree/nodejs"
+    "url": "git+https://github.com/wiedhodho/jspdf-invoice-template/tree/nodejs"
   },
   "keywords": [
     "jspdf-template",
@@ -22,12 +22,12 @@
     "ts-pdf-template",
     "node-js"
   ],
-  "author": "Edison Neza <edisonneza.dev@gmail.com>",
+  "author": "Wiedhodho aka Casper <wiedhodho@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/edisonneza/jspdf-invoice-template/issues"
+    "url": "https://github.com/wiedhodho/jspdf-invoice-template/issues"
   },
-  "homepage": "https://github.com/edisonneza/jspdf-invoice-template/tree/nodejs#readme",
+  "homepage": "https://github.com/wiedhodho/jspdf-invoice-template/tree/nodejs#readme",
   "dependencies": {
     "jspdf": "^2.3.1"
   },
