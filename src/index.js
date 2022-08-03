@@ -385,7 +385,7 @@ function jsPDFInvoiceTemplate(props) {
     row.forEach(function (rr, index) {
       const widthToUse = param.invoice.header[index]?.style?.width || tdWidth;
       let style = "";
-      console.log("typeof", typeof rr);
+      console.log("typeof ", typeof rr);
       if (typeof rr === "object") {
         let txt = rr.text;
         style = rr.style;
