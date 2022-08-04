@@ -87,7 +87,6 @@ export { OutputType, jsPDF };
  *   pageLabel?: string, } } props
  */
 function jsPDFInvoiceTemplate(props) {
-  console.log("coba edit sendiri ya bro sis");
   const param = {
     outputType: props.outputType || "save",
     returnJsPDFDocObject: props.returnJsPDFDocObject || false,
