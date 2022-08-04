@@ -183,7 +183,7 @@ function jsPDFInvoiceTemplate(props) {
   var colorBlack = "#000000";
   var colorGray = "#4d4e53";
   //starting at 15mm
-  var currentHeight = 15;
+  var currentHeight = 20;
   //var startPointRectPanel1 = currentHeight + 6;
 
   var pdfConfig = {
@@ -348,7 +348,8 @@ function jsPDFInvoiceTemplate(props) {
         const previousTdWidth = param.invoice.header[index - 1]?.style?.width || tdWidth;
         const widthToUse = currentTdWidth == previousTdWidth ? currentTdWidth : previousTdWidth;
         startWidth += widthToUse;
-        doc.text(row.title, startWidth + 11, currentHeight);
+        if (row?.style?.textAlign) doc.text(row.title, startWidth + currentTdWidth, currentHeight, row?.style?.textAlign);
+        else doc.text(row.title, startWidth + 11, currentHeight);
       }
     });
 
@@ -386,15 +387,17 @@ function jsPDFInvoiceTemplate(props) {
     row.forEach(function (rr, index) {
       const widthToUse = param.invoice.header[index]?.style?.width || tdWidth;
       let style = "",
-        item;
+        item,
+        txt;
 
       if (typeof rr === "object") {
-        let txt = rr.text;
+        txt = rr.text;
         style = rr.style;
-        item = splitTextAndGetHeight(txt.toString(), widthToUse - 1); //minus 1, to fix the padding issue between borders
       } else {
-        item = splitTextAndGetHeight(rr.toString(), widthToUse - 1); //minus 1, to fix the padding issue between borders
+        txt = rr.toString();
       }
+
+      item = splitTextAndGetHeight(txt, widthToUse - 1);
 
       if (index == 0) doc.text(item.text, 11, currentHeight + 4);
       else {
@@ -402,7 +405,7 @@ function jsPDFInvoiceTemplate(props) {
         const previousTdWidth = param.invoice.header[index - 1]?.style?.width || tdWidth;
         const widthToUse = currentTdWidth == previousTdWidth ? currentTdWidth : previousTdWidth;
         startWidth += widthToUse;
-        style === "" ? doc.text(item.text, 11 + startWidth, currentHeight + 4) : doc.text(item.text, startWidth + currentTdWidth - 11, currentHeight + 4, style);
+        style === "" ? doc.text(item.text, 11 + startWidth, currentHeight + 4) : doc.text(item.text, startWidth + currentTdWidth, currentHeight + 4, style);
       }
     });
 
