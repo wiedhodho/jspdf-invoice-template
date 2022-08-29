@@ -70,7 +70,11 @@ export { OutputType, jsPDF };
  *        }[],
  *       table?: any,
  *       invDescLabel?: string,
- *       invDesc?: string,
+ *       invDesc1?: string,
+ *       invDesc2?: string,
+ *       invDesc3?: string,
+ *       invDesc4?: string,
+ *       invDesc5?: string,
  *       additionalRows?: [{
  *           col1?: string,
  *           col2?: string,
@@ -129,6 +133,7 @@ function jsPDFInvoiceTemplate(props) {
       email: props.contact?.email || "",
       otherInfo: props.contact?.otherInfo || "",
     },
+    pembuka: { baris1: props.pembuka?.baris1 || "", baris2: props.pembuka?.baris2 || "" },
     invoice: {
       label: props.invoice?.label || "",
       num: props.invoice?.num || "",
@@ -139,7 +144,11 @@ function jsPDFInvoiceTemplate(props) {
       header: props.invoice?.header || [],
       table: props.invoice?.table || [],
       invDescLabel: props.invoice?.invDescLabel || "",
-      invDesc: props.invoice?.invDesc || "",
+      invDesc1: props.invoice?.invDesc1 || "",
+      invDesc2: props.invoice?.invDesc2 || "",
+      invDesc3: props.invoice?.invDesc3 || "",
+      invDesc4: props.invoice?.invDesc4 || "",
+      invDesc5: props.invoice?.invDesc5 || "",
       additionalRows: props.invoice?.additionalRows?.map((x) => {
         return {
           col1: x?.col1 || "",
@@ -150,6 +159,7 @@ function jsPDFInvoiceTemplate(props) {
           },
         };
       }),
+      ttd: props.invoice?.ttd || "",
     },
     footer: {
       text: props.footer?.text || "",
@@ -182,7 +192,7 @@ function jsPDFInvoiceTemplate(props) {
   var colorBlack = "#000000";
   var colorGray = "#4d4e53";
   //starting at 15mm
-  var currentHeight = 20;
+  var currentHeight = 10;
   //var startPointRectPanel1 = currentHeight + 6;
 
   var pdfConfig = {
@@ -224,8 +234,10 @@ function jsPDFInvoiceTemplate(props) {
   currentHeight += pdfConfig.subLineHeight;
   doc.text(docWidth - 10, currentHeight, param.business.email, "right");
 
-  currentHeight += pdfConfig.subLineHeight;
-  doc.text(docWidth - 10, currentHeight, param.business.email_1, "right");
+  if (param.business.email_1) {
+    currentHeight += pdfConfig.subLineHeight;
+    doc.text(docWidth - 10, currentHeight, param.business.email_1, "right");
+  }
 
   currentHeight += pdfConfig.subLineHeight;
   doc.text(docWidth - 10, currentHeight, param.business.website, "right");
@@ -293,6 +305,17 @@ function jsPDFInvoiceTemplate(props) {
   }
   //#endregion
 
+  // pembuka
+  doc.setFontSize(pdfConfig.fieldTextSize);
+  currentHeight += 10;
+  doc.text(10, currentHeight, param.pembuka.baris1);
+
+  currentHeight += pdfConfig.subLineHeight;
+  let pembuka2 = splitTextAndGetHeight(param.pembuka.baris2);
+
+  doc.text(10, currentHeight, pembuka2.text, { maxWidth: docWidth - 20 });
+
+  currentHeight += pembuka2.height + 8;
   //#region TABLE HEADER BORDER
   var addTableHeaderBorder = () => {
     currentHeight += 2;
@@ -438,7 +461,7 @@ function jsPDFInvoiceTemplate(props) {
   //doc.line(10, currentHeight, docWidth - 10, currentHeight); //if we want to show the last table line
   //#endregion
 
-  var invDescSize = splitTextAndGetHeight(param.invoice.invDesc, docWidth / 2).height;
+  var invDescSize = splitTextAndGetHeight(param.invoice.invDesc1, docWidth / 2).height;
 
   //#region PAGE BREAKER
   var checkAndAddPageLandscape = function () {
@@ -493,7 +516,7 @@ function jsPDFInvoiceTemplate(props) {
   if (param.invoice.additionalRows?.length > 0) {
     //#region Line breaker before invoce total
     doc.line(docWidth / 2, currentHeight, docWidth - 10, currentHeight);
-    currentHeight += pdfConfig.lineHeight;
+    // currentHeight += pdfConfig.lineHeight;
     //#endregion
 
     for (let i = 0; i < param.invoice.additionalRows.length; i++) {
@@ -501,7 +524,7 @@ function jsPDFInvoiceTemplate(props) {
       doc.setFontSize(param.invoice.additionalRows[i].style.fontSize);
 
       doc.text(docWidth / 1.5, currentHeight, param.invoice.additionalRows[i].col1, "right");
-      doc.text(docWidth - 25, currentHeight, param.invoice.additionalRows[i].col2, "right");
+      doc.text(docWidth - 20, currentHeight, param.invoice.additionalRows[i].col2, "right");
       doc.text(docWidth - 10, currentHeight, param.invoice.additionalRows[i].col3, "right");
       checkAndAddPage();
     }
@@ -537,7 +560,7 @@ function jsPDFInvoiceTemplate(props) {
 
   //#region INVOICE DESCRIPTION
   var addInvoiceDesc = () => {
-    doc.setFontSize(pdfConfig.labelTextSize);
+    doc.setFontSize(pdfConfig.fieldTextSize);
     doc.setTextColor(colorBlack);
 
     doc.text(param.invoice.invDescLabel, 10, currentHeight);
@@ -545,15 +568,52 @@ function jsPDFInvoiceTemplate(props) {
     doc.setTextColor(colorGray);
     doc.setFontSize(pdfConfig.fieldTextSize - 1);
 
-    var lines = doc.splitTextToSize(param.invoice.invDesc, docWidth / 2);
     //text in left half
-    doc.text(lines, 10, currentHeight);
-    currentHeight += doc.getTextDimensions(lines).h > 5 ? doc.getTextDimensions(lines).h + 6 : pdfConfig.lineHeight;
+    // var invdesc1 = doc.splitTextToSize(param.invoice.invDesc1, docWidth / 2);
+    doc.text(param.invoice.invDesc1[0], 10, currentHeight);
+    doc.text(param.invoice.invDesc1[1], 50, currentHeight);
+
+    currentHeight += pdfConfig.subLineHeight;
+    doc.text(param.invoice.invDesc2[0], 10, currentHeight);
+    doc.text(param.invoice.invDesc2[1], 50, currentHeight);
+
+    currentHeight += pdfConfig.subLineHeight;
+    doc.text(param.invoice.invDesc3[0], 10, currentHeight);
+    doc.text(param.invoice.invDesc3[1], 50, currentHeight);
+
+    currentHeight += pdfConfig.subLineHeight + 4;
+    doc.text(param.invoice.invDesc4[0], 10, currentHeight, { maxWidth: docWidth - 20 });
+
+    // terima kasih
+    doc.setFontSize(pdfConfig.fieldTextSize - 1);
+    currentHeight += pdfConfig.subLineHeight + 8;
+    doc.text(param.invoice.invDesc5[0], 10, currentHeight, { maxWidth: docWidth - 20 });
+
+    currentHeight += doc.getTextDimensions(param.invoice.invDesc5[0]).h > 5 ? doc.getTextDimensions(param.invoice.invDesc5[0]).h + 6 : pdfConfig.lineHeight;
 
     return currentHeight;
   };
+
   addInvoiceDesc();
   //#endregion
+
+  const ttd = () => {
+    checkAndAddPage();
+    //ttd
+    currentHeight += pdfConfig.lineHeight;
+    doc.text(docWidth / 1.3, currentHeight, param.invoice.ttd[0], "center");
+
+    currentHeight += pdfConfig.lineHeight;
+    doc.text(docWidth / 1.3, currentHeight, param.invoice.ttd[1], "center");
+
+    currentHeight += 20;
+    doc
+      .setFont(undefined, "bold")
+      .text(docWidth / 1.3, currentHeight, param.invoice.ttd[2], "center")
+      .setFont(undefined, "normal");
+  };
+
+  ttd();
 
   addStamp();
 

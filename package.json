@@ -1,6 +1,6 @@
 {
   "name": "@wiedhodho/jspdf-invoice-template-nodejs",
-  "version": "1.5.30",
+  "version": "1.5.4",
   "description": "PDF template created for invoice with optional parameters (for NodeJs). Using jsPDF library.",
   "main": "./dist/index.js",
   "scripts": {
